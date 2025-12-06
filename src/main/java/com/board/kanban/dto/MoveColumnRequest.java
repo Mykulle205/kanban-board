@@ -1,6 +1,9 @@
 package com.board.kanban.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+
 public record MoveColumnRequest(
-        Long boardId,
-        int nextPosition
+        @NotNull Long boardId,
+        @PositiveOrZero int nextPosition
 ) {}

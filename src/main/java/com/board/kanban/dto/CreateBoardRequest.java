@@ -1,6 +1,8 @@
 package com.board.kanban.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record CreateBoardRequest(
-        String name,
+        @NotBlank String name,
         String description
 ) {}
