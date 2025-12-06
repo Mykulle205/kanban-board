@@ -5,7 +5,10 @@ import com.board.kanban.dto.CreateColumnRequest;
 import com.board.kanban.dto.MoveColumnRequest;
 import com.board.kanban.dto.UpdateColumnRequest;
 import com.board.kanban.model.KanbanColumn;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,32 +19,54 @@ public class ColumnController {
     private final KanbanService kanbanService;
 
     @PostMapping("/board/{boardId}")
-    public KanbanColumn addColumn(@PathVariable Long boardId,
-                                  @RequestBody CreateColumnRequest request) {
-        return kanbanService.addColumn(boardId, request.name(), request.wipLimit());
+    public ResponseEntity<KanbanColumn> addColumn(@PathVariable Long boardId,
+                                                  @Valid @RequestBody CreateColumnRequest request) {
+
+        KanbanColumn column = kanbanService.addColumn(
+                boardId,
+                request.name(),
+                request.wipLimit()
+        );
+
+        // 201 for resource creation
+        return ResponseEntity.status(HttpStatus.CREATED).body(column);
     }
 
     @GetMapping("/{columnId}")
-    public KanbanColumn getColumn(@PathVariable Long columnId) {
-        return kanbanService.getColumn(columnId);
+    public ResponseEntity<KanbanColumn> getColumn(@PathVariable Long columnId) {
+        KanbanColumn column = kanbanService.getColumn(columnId);
+        return ResponseEntity.ok(column);
     }
 
     @PutMapping("/{columnId}")
-    public KanbanColumn updateColumn(@PathVariable Long columnId,
-                                     @RequestBody UpdateColumnRequest request) {
-        return kanbanService.updateColumn(columnId, request.name(), request.wipLimit());
+    public ResponseEntity<KanbanColumn> updateColumn(@PathVariable Long columnId,
+                                                     @Valid @RequestBody UpdateColumnRequest request) {
+
+        KanbanColumn updated = kanbanService.updateColumn(
+                columnId,
+                request.name(),
+                request.wipLimit()
+        );
+
+        return ResponseEntity.ok(updated);
     }
 
     @PostMapping("/{columnId}/move")
-    public KanbanColumn moveColumn(@PathVariable Long columnId,
-                                   @RequestBody MoveColumnRequest request) {
-        // usually request.targetBoardId() == current board
-        return kanbanService.moveColumn(request.boardId(), columnId, request.nextPosition());
+    public ResponseEntity<KanbanColumn> moveColumn(@PathVariable Long columnId,
+                                                   @Valid @RequestBody MoveColumnRequest request) {
+        // usually request.boardId() == current board
+        KanbanColumn moved = kanbanService.moveColumn(
+                request.boardId(),
+                columnId,
+                request.nextPosition()
+        );
+
+        return ResponseEntity.ok(moved);
     }
 
     @DeleteMapping("/{columnId}")
-    public void deleteColumn(@PathVariable Long columnId) {
+    public ResponseEntity<Void> deleteColumn(@PathVariable Long columnId) {
         kanbanService.deleteColumn(columnId);
+        return ResponseEntity.noContent().build(); // 204
     }
-
 }

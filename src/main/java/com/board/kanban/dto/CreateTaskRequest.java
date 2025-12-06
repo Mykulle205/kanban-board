@@ -1,10 +1,12 @@
 package com.board.kanban.dto;
 
 import com.board.kanban.model.TaskPriority;
+import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDate;
 
 public record CreateTaskRequest(
-        String name,
+        @NotBlank String name,
         String description,
         TaskPriority taskPriority,
         String assignee,
